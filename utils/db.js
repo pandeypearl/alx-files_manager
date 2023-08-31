@@ -38,6 +38,10 @@ class DBClient {
     async insertOne(collection, data) {
         return this._db.collection(collection).insertOne(data);
     }
+
+    async findOne(collection, data) {
+        return this._db.collection(collection).findOne(data);
+    }
 }
 
 const dbClient = new DBClient();
