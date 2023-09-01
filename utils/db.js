@@ -43,6 +43,10 @@ class DBClient {
         return this._db.collection(collection).findOne(data);
     }
 
+    async updateOne(collection, filter, updateDoc) {
+        return this._db.collection(collection).updateOne(filter, updateDoc);
+    }
+
     async listFiles(data) {
         let list = [];
         const { userId, page } = data;

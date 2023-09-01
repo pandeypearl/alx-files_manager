@@ -106,4 +106,42 @@ const getIndex = async (req, res) => {
     }
 };
 
-module.exports = { postUpload, getShow, getIndex };
+const putPublish = async (req, res) => {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+    if (token === undefined || !userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const fileId = req.params.id;
+    if (fileId && fileId.length !== 24) return res.status(404).json({ error: 'Not found' });
+    try {
+        const update = await dbClient.updateOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) }, { $set: {  isPublic: true }  });
+        if (update.matchedCount === 0) return res.status(404).json({ error: 'Not found' });
+        const updatedFile = await dbClient.findOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) });
+        return res.json(Transform([updatedFile])[0]);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+const putUnpublish = async (req, res) => {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+    if (token === undefined || !userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const fileId = req.params.id;
+    if (fileId && fileId.length !== 24) return res.status(404).json({ error: 'Not found' });
+    try {
+        const update = await dbClient.updateOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) }, { $set: { isPublic: false} });
+        if (update.matchedCount === 0) return res.status(404).json({ error: 'Not found' });
+        const updatedFile = await dbClient.findOne('files', { _id: Object(fileId), userId: ObjectId(userId) });
+        return res.json(Transform([updatedFile])[0]);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+module.exports = { postUpload, getShow, getIndex, putPublish, putUnpublish };
