@@ -4,6 +4,7 @@ import Queue from 'bull';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import fs from 'fs';
+import Transform from '../utils/transform';
 
 const postUpload = async (req, res) => {
     const token = req.headers['x-token'];
@@ -69,4 +70,40 @@ const postUpload = async (req, res) => {
     }
 };
 
-module.exports = postUpload;
+const getShow = async (req, res) => {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+    if (token === undefined || !userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const fileId = req.params.id;
+    if (fileId && fileId.length !== 24) return res.status(404).json({ error: 'Not found' });
+    try {
+        const file = await dbClient.findOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) });
+        if (!file) return res.status(404).json({ error: 'Not found' });
+        delete file.localPath;
+        return res.json(Transform([file])[0]);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal; server error' });
+    }
+};
+
+const getIndex = async (req, res) => {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+    if (token === undefined || !userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { parentId, page = 0 } = req.query;
+    if (parentId && parentId !== '0' && parentId.length !== 24) return res.json([]);
+    try {
+        const data = await dbClient.listFiles({ userId, parentId, page });
+        return res.json(Transform(data[0].data));
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+module.exports = { postUpload, getShow, getIndex };

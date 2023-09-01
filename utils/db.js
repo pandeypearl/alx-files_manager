@@ -42,6 +42,27 @@ class DBClient {
     async findOne(collection, data) {
         return this._db.collection(collection).findOne(data);
     }
+
+    async listFiles(data) {
+        let list = [];
+        const { userId, page } = data;
+        let { parentId } = data;
+        if (parentId === undefined) {
+            list = [
+                { $match: { userId: ObjectId(userId) }},
+                { $facet: { data: [{ $skip: page * 20 }, { $limit: 20 }] }},
+            ];
+        } else {
+            if (parentId !== '0') {
+                parentId = ObjectId(parentId);
+            }
+            list = [
+                { $match: { userId: ObjectId(userId), parentId }},
+                { $facet: { data: [{ $skip: page * 20 }, { $limit: 20 }] }},
+            ];
+        }
+        return this._db.collection('files').aggregate(list).toArray();
+    }
 }
 
 const dbClient = new DBClient();
