@@ -25,7 +25,7 @@ const getDisconnect = async (req, res) => {
   console.log(token);
   const userId = await redisClient.get(`auth_${token}`);
   if (userId) {
-    const deleted = await redisClient.get(`auth_${token}`);
+    const deleted = await redisClient.del(`auth_${token}`);
     if (deleted === 1) return res.status(204).end();
     return res.status(500).json({ error: 'Internal server error' });
   }
