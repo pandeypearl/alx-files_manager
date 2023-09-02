@@ -15,11 +15,11 @@ router.post('/users', UserController.postNew);
 router.get('/users/me', UserController.getMe);
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
-router.get('/files', FilesController.postUpload);
+router.post('/files', FilesController.postUpload);
 router.get('/files/:id', FilesController.getShow);
 router.get('/files/', FilesController.getIndex);
 router.put('/files/:id/publish', FilesController.putPublish);
 router.put('/files/:id/unpublish', FilesController.putUnpublish);
-router.put('/files/:id/data', FilesController.getFile);
+router.get('/files/:id/data', FilesController.getFile);
 
 export default router;
