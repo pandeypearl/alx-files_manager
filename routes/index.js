@@ -12,7 +12,7 @@ const router = Router();
 router.get('/status', AppController.getStatus);
 router.get('/stats', AppController.getStatus);
 router.post('/users', UsersController.postNew);
-router.get('/users/me', UsersController.getMe);
+router.get('/users/me', UserController.getMe);
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 router.get('/files', FilesController.postUpload);
