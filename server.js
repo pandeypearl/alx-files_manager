@@ -13,7 +13,7 @@ app.use(express.json());
 app.use('/', router);
 
 app.listen(PORT, () => {
-    console.log(`Express server is alive on port ${PORT}`);
+  console.log(`Express server is alive on port ${PORT}`);
 });
 
 export default app;
