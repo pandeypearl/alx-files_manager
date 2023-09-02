@@ -1,5 +1,6 @@
 /**
- * Processes the FileQueue
+ * Processes the FileQueue, UserQueue
+ * Creates Thumbnails with width size (500, 250, 100)
  */
 import fs from 'fs';
 import Queue from 'bull';
@@ -8,6 +9,7 @@ import imageThumbnail from 'image-thumbnail';
 import dbClient from './utils/db';
 
 const fileQueue = new Queue('fileQueue');
+const userQueue = new Queue('userQueue');
 
 async function thumbnail(path, width) {
     try {
@@ -53,4 +55,17 @@ fileQueue.process((job, done) => {
             console.log(err);
             done(err);
         });
+});
+
+userQueue.process(async (job, done) => {
+    const { userId } = job.data;
+    try {
+        if (userId === undefined) throw new Error('Missing UserId');
+        const user = await dbClient.findOne('users', { _id: ObjectId(userId) });
+        if (!user) throw new Error('User not found');
+        console.log(`Welcome ${user.email}`);
+        done();
+    } catch (error) {
+        done(error);
+    }
 });
