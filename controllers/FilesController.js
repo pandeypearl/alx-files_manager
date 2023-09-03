@@ -1,8 +1,8 @@
+import fs from 'fs';
 import { ObjectId } from 'mongodb';
 import { v4 as uuid4 } from 'uuid';
-import Queue from 'bull';
-import fs from 'fs';
 import mime from 'mime-types';
+import Queue from 'bull';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import Transform from '../utils/transform';
@@ -137,7 +137,7 @@ const putUnpublish = async (req, res) => {
   try {
     const update = await dbClient.updateOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) }, { $set: { isPublic: false } });
     if (update.matchedCount === 0) return res.status(404).json({ error: 'Not found' });
-    const updatedFile = await dbClient.findOne('files', { _id: Object(fileId), userId: ObjectId(userId) });
+    const updatedFile = await dbClient.findOne('files', { _id: ObjectId(fileId), userId: ObjectId(userId) });
     return res.json(Transform([updatedFile])[0]);
   } catch (error) {
     console.log(error);
