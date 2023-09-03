@@ -161,7 +161,7 @@ const getFile = async (req, res) => {
   if (file.isPublic === false && (!userId || file.userId.toString() !== userId)) {
     return res.status(404).json({ error: 'Not found' });
   }
-  if (file.type === 'folder') return res.status(400).json({ error: 'A folder does\'t have content ' });
+  if (file.type === 'folder') return res.status(400).json({ error: 'A folder doesn\'t have content' });
   if (file.type === 'image') {
     if (size) {
       if (['500', '250', '100'].indexOf(size) === -1) {
