@@ -1,3 +1,6 @@
+/**
+ * Defines handler for files routes
+ */
 import fs from 'fs';
 import { ObjectId } from 'mongodb';
 import { v4 as uuid4 } from 'uuid';
